@@ -43,7 +43,7 @@ void *listen_udp(void *args) {
 	while (1) {
 		recv(sock, buf, sizeof(buf), 0);
 
-		if (buf[0] == '\0') {
+		if (strlen(buf) <= 1) {
 			break;
 		}
 

@@ -20,16 +20,14 @@ int main(void) {
 
 	while (1) {
 		fgets(&buf, sizeof(buf), stdin);
-		
-		if (strlen(buf) == 0) {
-			buf[0] = '\0';
-			sendto(sock, buf, sizeof(buf), 0, (struct sockaddr*) &addr, sizeof(addr));
+		sendto(sock, buf, sizeof(buf), 0, (struct sockaddr*) &addr, sizeof(addr));
+
+		if (strlen(buf) <= 1) {
 			break;
 		}
-
-		sendto(sock, buf, sizeof(buf), 0, (struct sockaddr*) &addr, sizeof(addr));
 	}
 
+	printf("Exiting Program...\n");
 	close(sock);
 
 	return 0;
