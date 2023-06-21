@@ -30,7 +30,7 @@ void *listen_udp(void *args) {
 	int i;
 	struct sockaddr_in addr;
 
-	int buf[8];
+	char buf[100];
 
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -40,9 +40,14 @@ void *listen_udp(void *args) {
 
 	bind(sock, (struct sockaddr*) &addr, sizeof(addr));
 
-	for (i = 0; i < 5; i++) {
+	while (1) {
 		recv(sock, buf, sizeof(buf), 0);
-		printf("%d\n", buf[i]);
+
+		if (buf[0] == '\0') {
+			break;
+		}
+
+		printf("%s\n", buf);
 	}
 
 	close(sock);
