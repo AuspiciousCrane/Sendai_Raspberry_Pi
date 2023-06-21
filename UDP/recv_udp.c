@@ -11,7 +11,7 @@ int main(void) {
 	int i;
 	struct sockaddr_in addr;
 
-	int buf[8];
+	float buf[8];
 
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -22,10 +22,10 @@ int main(void) {
 	bind(sock, (struct sockaddr*) &addr, sizeof(addr));
 
 	for (i = 0; i < 5; i++) {
-		// memset(buf, 0, sizeof(buf));
+		memset(buf, 0, sizeof(buf));
 		recv(sock, buf, sizeof(buf), 0);
 
-		printf("%d\n", buf[i]);
+		printf("%f\n", buf[i]);
 	}
 
 	close(sock);
