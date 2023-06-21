@@ -7,16 +7,29 @@
 #include <unistd.h>
 
 #define LISTEN_PORT 8889
+#define MSG_SIZE 100
 
 void *listen_udp(void *args);
 
 int main(void) {
+	int pipe_handle[2];
+	char msgbuf[MSG_SIZE];
+
+	if (pipe(pipe_handle) < 0) {
+		exit(0);
+	}
+
 	pthread_t thread_id;
-	pthread_create(&thread_id, NULL, listen_udp, NULL);
+	pthread_create(&thread_id, NULL, listen_udp, pipe_handle[1]);
 	
-	for (int i = 0; i < 5; i++) {
-		sleep(1);
-		printf("Main Thread Working...\n");
+	while(1) {
+		read(pipe_handle[0], msgbuf, MSG_SIZE);
+
+		if (strlen(msgbuf) <= 1) {
+			break;
+		}
+
+		printf("%s\n", msgbuf);
 	}
 
 	pthread_join(thread_id, NULL);
@@ -28,6 +41,7 @@ int main(void) {
 void *listen_udp(void *args) {
 	int sock;
 	int i;
+	int writer = args;
 	struct sockaddr_in addr;
 
 	char buf[100];
@@ -43,11 +57,11 @@ void *listen_udp(void *args) {
 	while (1) {
 		recv(sock, buf, sizeof(buf), 0);
 
+		write(writer, buf, MSG_SIZE);
+
 		if (strlen(buf) <= 1) {
 			break;
 		}
-
-		printf("%s\n", buf);
 	}
 
 	close(sock);
