@@ -13,6 +13,8 @@ int main(void) {
 
 	int buf[8];
 
+	sock = socket(AF_INET, SOCK_DGRAM, 0);
+
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(LISTEN_PORT);
 	addr.sin_addr.s_addr = INADDR_ANY;
