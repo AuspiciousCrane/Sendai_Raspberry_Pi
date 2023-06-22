@@ -2,18 +2,26 @@
 #include <unistd.h>
 #include <pigpio.h>
 
+#define OUTPUT_PIN 4
+#define DURATION 1
+
 int main() {
+	printf("Starting Program...\n");
+
 	if (gpioInitialise() < 0) {
 		return 1;
 	}
 
-	gpioSetMode(16, PI_OUTPUT);
+	gpioSetMode(OUTPUT_PIN, PI_OUTPUT);
 
-	gpioWrite(16, 1);
-	time_sleep(0.5);
+	while(1) {
+		gpioWrite(OUTPUT_PIN, 1);
+		time_sleep(DURATION);
 
-	gpioWrite(16, 0);
-	time_sleep(0.5);
+		gpioWrite(OUTPUT_PIN, 0);
+		time_sleep(DURATION);
+	}
 
+	printf("Exiting Program...\n");
 	return 0;
 }
