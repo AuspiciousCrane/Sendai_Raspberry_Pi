@@ -5,33 +5,34 @@
 #include <string.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <sys/mman.h>
+#include <stdlib.h>
 
 #define LISTEN_PORT 8889
-#define MSG_SIZE 100
+#define MSG_SIZE 128
 
 void *listen_udp(void *args);
+void *create_shared_memory(size_t size);
 
 int main(void) {
-	int pipe_handle[2];
-	char msgbuf[MSG_SIZE];
-
-	if (pipe(pipe_handle) < 0) {
-		exit(0);
-	}
+	void* shmem = create_shared_memory(MSG_SIZE);
+	memcpy(shmem, "", sizeof(""));	
 
 	pthread_t thread_id;
-	pthread_create(&thread_id, NULL, listen_udp, pipe_handle[1]);
+	pthread_create(&thread_id, NULL, listen_udp, shmem);
 	
 	while(1) {
-		read(pipe_handle[0], msgbuf, MSG_SIZE);
-
-		if (strlen(msgbuf) <= 1) {
+		if (strcmp(shmem, "") == 0) {
+			continue;
+		} else if (strlen(shmem) <= 1) {
 			break;
+		} else {
+			printf("%s\n", shmem);
+			memcpy(shmem, "", sizeof(""));	
 		}
-
-		printf("%s\n", msgbuf);
 	}
 
+	printf("Waiting for recv thread to join...\n");
 	pthread_join(thread_id, NULL);
 
 	printf("Exiting Program...\n");
@@ -41,7 +42,7 @@ int main(void) {
 void *listen_udp(void *args) {
 	int sock;
 	int i;
-	int writer = args;
+	void* shmem = args;
 	struct sockaddr_in addr;
 
 	char buf[100];
@@ -56,8 +57,7 @@ void *listen_udp(void *args) {
 
 	while (1) {
 		recv(sock, buf, sizeof(buf), 0);
-
-		write(writer, buf, MSG_SIZE);
+		memcpy(shmem, buf, sizeof(buf));
 
 		if (strlen(buf) <= 1) {
 			break;
@@ -66,3 +66,10 @@ void *listen_udp(void *args) {
 
 	close(sock);
 }
+
+void *create_shared_memory(size_t size) {
+	int protection = PROT_READ | PROT_WRITE;
+	int visibility = MAP_SHARED | MAP_ANONYMOUS;
+	return mmap(NULL, size, protection, visibility, -1, 0);
+}
+
