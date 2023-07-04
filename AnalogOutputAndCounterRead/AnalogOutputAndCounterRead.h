@@ -15,12 +15,12 @@
 #define DAC_OUTPUT_RANGE 50 // 50 is 0-10V
 
 
-void initialize_counter(unsigned long count_data);
-void initialize_dac();
+void aocr_initialize_counter(unsigned long count_data);
+void aocr_initialize_dac();
 
-void evaluate_return_code_cnt(long r_code);
-void evaluate_return_code_aio(long r_code);
+void aocr_evaluate_return_code_cnt(long r_code);
+void aocr_evaluate_return_code_aio(long r_code);
 
-void print_count_value(unsigned long count);
+void aocr_print_count_value(unsigned long count);
 
 
